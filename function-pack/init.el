@@ -5,6 +5,7 @@
 
 ;; Load bindings config
 (live-load-config-file "bindings.el")
+(live-load-config-file "org-mode.el")
 
 (load (concat (live-pack-lib-dir) "functions.el"))
 (load (concat (live-pack-lib-dir) "inf-mongo.el"))
