@@ -1,0 +1,227 @@
+.TH MU 1 "January 2012" "User Manuals"
+
+.SH NAME
+
+mu \- a set of tools to deal with Maildirs and message files, in particular to
+index and search e-mail messages.
+
+.SH SYNOPSIS
+
+.B mu [options]
+
+.B mu index [options]
+
+.B mu find [options] <search expression>
+
+.B mu view <file> [<files>]
+
+.B mu mkdir [options] <dir> [<dirs>]
+
+.B mu extract [options] <file> [<parts>] [<regexp>]
+
+.B mu cfind [options] [<regexp>]
+
+
+.SH DESCRIPTION
+
+\fBmu\fR is a set of tools for dealing with Maildirs and the e-mail messages
+in them.
+
+\fBmu\fRs main function is to enable searching of e-mail messages. It does so
+by periodically scanning a Maildir directory tree and analyzing the e-mail
+messages found ('indexing'). The results of this analysis are stored in a
+database, which can then be queried.
+
+In addition to indexing and searching, \fBmu\fR also offers functionality for
+viewing messages, extracting attachments and creating maildirs, and searching
+and exporting contact information.
+
+\fBmu\fR can be used from the command line or can be integrated with various
+e-mail clients.
+
+This manpage gives a general overview of the available commands
+(\fBindex\fR, \fBfind\fR, etc.); each of the \fBmu\fR commands has its
+own man-page as well.
+
+.SH COMMANDS
+
+\fBmu\fR offers the following commands:
+
+.TP
+\fBindex\fR
+for indexing (analyzing) the contents of your Maildirs, and storing the
+information in a database. See
+.BR mu-index(1)
+\.
+
+.TP
+\fBfind\fR
+for finding messages in your database, using certain search
+parameters. See
+.BR mu-find(1)
+\.
+
+
+.TP
+\fBcfind\fR
+for finding contacts (names + e-mail addresses) matching a certain expression,
+and exporting the results in various formats for use in other programs.
+.BR mu-cfind(1)
+\.
+
+.TP
+\fBview\fR
+for displaying e-mail messages. See
+.BR mu-view(1)
+\.
+
+.TP
+\fBmkdir\fR
+for creating Maildirs. See
+.BR mu-mkdir(1)
+\.
+
+.TP
+\fBextract\fR
+for extract MIME-parts (such as attachments) from messages. See
+.BR mu-extract(1)
+\.
+
+.SH COLORS
+
+Some \fBmu\fR sub-commands support colorized output. If you don't want this,
+you can use the \fI--nocolor\fR/ option to disable it. Even then, colors will
+only shown when output goes to a sufficiently capable terminal (this roughly
+mirrors the \fI--color=auto\fR of the GNU-version of the \fBls\fR-command).
+
+Instead of the \fI--color\fR/, you can also set the \fBMU_NOCOLOR\fR
+environment variable to non-empty to disable colors.
+
+Currently, \fBmu find\fR, \fBmu view\fR, \fBmu cfind\fR and \fBmu extract\fR
+support colors.
+
+.SH ENCODING
+
+\fBmu\fR's output is in the current locale, with the exceptions of the output
+specifically meant for output to UTF8-encoded files. In practice, this means
+that the output of commands \fBindex\fR, \fBview\fR,
+\fBextract\fR is always encoded according to the current locale.
+
+The same is true for \fBfind\fR and \fBcfind\fR, with some exceptions, where
+the output is always UTF-8, regardless of the locale.
+
+For \fBcfind\fR the exception is \fI--format=bbdb\fR. This is hard-coded to
+UTF-8, and as such specified in the output-file, so emacs/bbdb can handle it
+correctly without guessing.
+
+For \fBfind\fR the output is encoded according the locale for
+\fI--format=plain\fR (the default), and UTF-8 for all other formats
+(\fIjson\fR, \fIsexp\fR, \fIxml\fR).
+
+.SH DATABASE AND FILE
+
+Commands \fBmu index\fR and \fBfind\fR and \fBcfind\fR work with the database,
+while the other ones work on invidual mail files. Hence, running \fview\fR,
+\fBmkdir\fR and \fBextract\fR does not require the mu database.
+
+The various commands are discussed in more detail in their own separate
+man-pages; here the general options are discussed.
+
+.SH OPTIONS
+
+\fBmu\fR offers a number of general options that apply to all commands,
+including \fBmu\fR without any command.
+
+.TP
+\fB\-\-muhome\fR
+causes \fBmu\fR to use an alternative directory to
+store and read its database and logs. By default, \fI~/.mu\fR is used.
+
+.TP
+\fB\-d\fR, \fB\-\-debug\fR
+makes \fBmu\fR generate extra debug information,
+useful for debugging the program itself. By default, debug information goes to
+the log file, \fI~/.mu/mu.log\fR. It can safely be deleted when \fBmu\fR is
+not running. When running with \fB--debug\fR option, the log file can grow
+rather quickly. See the note on logging below.
+
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+causes \fBmu\fR not to output informational
+messages and progress information to standard output, but only to the log
+file. Error messages will still be sent to standard error. Note that \fBmu
+index\fR is \fBmuch\fR faster with \fB\-\-quiet\fR, so it is recommended you
+use this option when using \fBmu\fR from scripts etc.
+
+.TP
+\fB\-\-log-stderr\fR
+causes \fBmu\fR to \fBnot\fR output log messages to standard error, in
+addition to sending them to the log file.
+
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+prints \fBmu\fR version and copyright information.
+
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+lists the various command line options, while \fB\-\-help\-index\fR,
+\fB\-\-help\-find\fR and \fB\-\-help\-all\fR list only the options for
+respectively the specified command or for all commands.
+
+.SH ERROR CODES
+
+The various mu subcommands typically exit with 0 (zero) upon success, and
+non-zero when some error occured. The table lists the various error codes.
+
+.nf
+exit code |  error
+----------+-------------------------------------------
+     1	  |  MU_ERROR
+     2	  |  MU_ERROR_IN_PARAMETERS
+     3	  |  MU_ERROR_INTERNAL
+     4	  |  MU_ERROR_NO_MATCHES
+	  |
+     11	  |  MU_ERROR_XAPIAN
+	  |
+     13	  |  MU_ERROR_XAPIAN_QUERY
+     14	  |  MU_ERROR_XAPIAN_DIR_NOT_ACCESSIBLE
+     15	  |  MU_ERROR_XAPIAN_NOT_UP_TO_DATE
+     16	  |  MU_ERROR_XAPIAN_MISSING_DATA
+     17	  |  MU_ERROR_XAPIAN_CORRUPTION
+     18	  |  MU_ERROR_XAPIAN_CANNOT_GET_WRITELOCK
+     30	  |  MU_ERROR_GMIME
+	  |
+     50	  |  MU_ERROR_CONTACTS
+     51	  |  MU_ERROR_CONTACTS_CANNOT_RETRIEVE
+	  |
+     70	  |  MU_ERROR_FILE
+     71	  |  MU_ERROR_FILE_INVALID_NAME
+     72	  |  MU_ERROR_FILE_CANNOT_LINK
+     73	  |  MU_ERROR_FILE_CANNOT_OPEN
+     74	  |  MU_ERROR_FILE_CANNOT_READ
+     75	  |  MU_ERROR_FILE_CANNOT_CREATE
+     76	  |  MU_ERROR_FILE_CANNOT_MKDIR
+     77	  |  MU_ERROR_FILE_STAT_FAILED
+     78	  |  MU_ERROR_FILE_READDIR_FAILED
+     79	  |  MU_ERROR_FILE_INVALID_SOURCE
+.fi
+
+.SH BUGS
+
+Please report bugs if you find them:
+.BR http://code.google.com/p/mu0/issues/list
+
+.SH AUTHOR
+
+Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+
+.SH "SEE ALSO"
+
+.BR mu-index(1)
+.BR mu-find(1)
+.BR mu-cfind(1)
+.BR mu-mkdir(1)
+.BR mu-view(1)
+.BR mu-extract(1)
+.BR mu-easy(1)
+.BR mu-bookmarks(5)

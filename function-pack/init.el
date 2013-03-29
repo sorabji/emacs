@@ -7,3 +7,4 @@
 (live-load-config-file "bindings.el")
 
 (load (concat (live-pack-lib-dir) "functions.el"))
+(load (concat (live-pack-lib-dir) "inf-mongo.el"))
