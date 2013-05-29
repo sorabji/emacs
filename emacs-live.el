@@ -1,7 +1,5 @@
 (require 'package)
-(add-to-list 'package-archives
-    '("marmalade" .
-      "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives '("marmalade" ."http://marmalade-repo.org/packages/"))
 (package-initialize)
 
 (live-add-packs '(~/config/emacs-live-packs/php-pack

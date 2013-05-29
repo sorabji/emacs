@@ -8,7 +8,7 @@
 (require 'php-mode)
 (add-hook 'php-mode-hook
           '(lambda () (progn
-                    (define-abbrev php-mode-abbrev-table "ex" "extends"))))
+                        (define-abbrev php-mode-abbrev-table "ex" "extends"))))
 
 (defun clean-php-mode ()
     (interactive)

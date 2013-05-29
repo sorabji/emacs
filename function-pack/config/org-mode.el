@@ -30,24 +30,6 @@
 (add-hook 'org-clock-out-hook 'bh/remove-empty-drawer-on-clock-out 'append)
 (add-hook 'org-clock-out-hook 'bh/clock-out-maybe 'append)
 
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; org-mobile                                                ;;
-;; you do not work as you should.  cannot write from mobile  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(setq org-mobile-directory "~/public_org"
-      org-mobile-files (list "~/org/gtd.org" "~/org/refile.org" "~/org/jira/"))
-(add-hook 'org-mobile-post-push-hook
-          (lambda () (shell-command
-                      "scp -r ~/public_org/* ratio@ratio.devvz.com:/home/ratio/mobile_org")))
-(add-hook 'org-mobile-pre-pull-hook
-          (lambda () (shell-command
-                      "scp ratio@ratio.devvz.com:/home/ratio/mobile_org/mobileorg.org ~/public_org/")))
-(add-hook 'org-mobile-post-pull-hook
-          (lambda () (shell-command
-                      "scp ~/public_org/mobileorg.org ratio@ratio.devvz.com:/home/ratio/mobile_org/")))
-
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org capture.                                       ;;
 ;; i will make you work in firefox one of these days. ;;
