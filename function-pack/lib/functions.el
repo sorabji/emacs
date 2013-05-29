@@ -143,3 +143,36 @@ instead."
                     (string= (car imenu--rescan-item) name))
           (add-to-list 'symbol-names name)
           (add-to-list 'name-and-pos (cons name position))))))))
+
+(defun php-cs-file ()
+  (interactive)
+  (shell-command (concat "php-cs-fixer fix " (buffer-file-name)))
+  (revert-buffer))
+
+(defun php-cs-list-errors ()
+  (interactive)
+  (shell-command (concat "~/dev/gif/getitfree/vendor/bin/phpcs --report=emacs --standard=PSR2 " (buffer-file-name))))
+
+(defun psr-gif ()
+  (interactive)
+  (with-output-to-temp-buffer "*psr-gif*"
+    (shell-command (concat "~/dev/gif/getitfree/vendor/bin/phpcs --report=emacs --standard=PSR2 ~/dev/gif/getitfree/src "))
+    (switch-to-buffer "*psr-gif*")))
+
+(defun djcb-gtags-create-or-update ()
+  "create or update the gnu global tag file"
+  (interactive)
+  (if (not (= 0 (call-process "global" nil nil nil " -p"))) ; tagfile doesn't exist?
+    (let ((olddir default-directory)
+          (topdir (read-directory-name
+                    "gtags: top of source tree:" default-directory)))
+      (cd topdir)
+      (shell-command "gtags && echo 'created tagfile'")
+      (cd olddir)) ; restore
+    ;;  tagfile already exists; update it
+    (shell-command "global -u && echo 'updated tagfile'")))
+
+(add-hook 'gtags-mode-hook
+  (lambda()
+    (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
+    (local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
