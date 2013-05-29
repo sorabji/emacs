@@ -159,20 +159,21 @@ instead."
     (shell-command (concat "~/dev/gif/getitfree/vendor/bin/phpcs --report=emacs --standard=PSR2 ~/dev/gif/getitfree/src "))
     (switch-to-buffer "*psr-gif*")))
 
-(defun djcb-gtags-create-or-update ()
-  "create or update the gnu global tag file"
-  (interactive)
-  (if (not (= 0 (call-process "global" nil nil nil " -p"))) ; tagfile doesn't exist?
-    (let ((olddir default-directory)
-          (topdir (read-directory-name
-                    "gtags: top of source tree:" default-directory)))
-      (cd topdir)
-      (shell-command "gtags && echo 'created tagfile'")
-      (cd olddir)) ; restore
-    ;;  tagfile already exists; update it
-    (shell-command "global -u && echo 'updated tagfile'")))
+(defun djcb-term-start-or-switch (prg &optional use-existing)
+  "* run program PRG in a terminal buffer. If USE-EXISTING is non-nil "
+  " and PRG is already running, switch to that buffer instead of starting"
+  " a new instance."
+  (interactive "sProgram: ")
+  (let ((bufname (concat "*" prg "*")))
+    (when (not (and use-existing
+                    (let ((buf (get-buffer bufname)))
+                      (and buf (buffer-name (switch-to-buffer bufname))))))
+      (ansi-term prg prg))))
 
-(add-hook 'gtags-mode-hook
-  (lambda()
-    (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
-    (local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
+(defmacro djcb-program-shortcut (name key &optional use-existing)
+  "* macro to create a key binding KEY to start some terminal program PRG;
+    if USE-EXISTING is true, try to switch to an existing buffer"
+  `(global-set-key ,key
+     '(lambda()
+        (interactive)
+        (djcb-term-start-or-switch ,name ,use-existing))))
