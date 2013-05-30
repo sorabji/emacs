@@ -10,7 +10,6 @@
 (load (concat (live-pack-lib-dir) "functions.el"))
 (load (concat (live-pack-lib-dir) "inf-mongo.el"))
 (load (concat (live-pack-lib-dir) "ack-and-a-half.el"))
-(load (concat (live-pack-lib-dir) "etags-select.el"))
 
 ; w3m
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
@@ -19,7 +18,6 @@
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "chromium-browser")
 
-(require 'etags-select)
 (require 'ack-and-a-half)
 (defalias 'ack 'ack-and-a-half)
 (defalias 'ack-same 'ack-and-a-half-same)
