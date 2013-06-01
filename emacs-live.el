@@ -3,6 +3,8 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
 
+(set-frame-font "Monaco 10")
+
 (live-add-packs '(~/config/emacs-live-packs/php-pack
                   ~/config/emacs-live-packs/function-pack
                   ;~/config/emacs-live-packs/emms-pack
