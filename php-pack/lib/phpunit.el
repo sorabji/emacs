@@ -1,5 +1,7 @@
-(defvar phpunit-regexp-alist
-  '(("^\\(.*\\.php\\):\\([0-9]+\\)$" 1 2 nil nil 1))
+(require 'eproject)
+
+(defvar phpunit-regex
+  '("^\\(.*\\.php\\):\\([0-9]+\\)$" 1 2 nil nil 1)
   "Regexp used to match PHPUnit output. See `compilation-error-regexp-alist'.")
 
 (defvar phpunit-error-face compilation-error-face
@@ -8,23 +10,38 @@
 (defvar phpunit-warning-face compilation-warning-face
   "Face name to use for phpunit warnings.")
 
+(defcustom phpunit-setup-hook nil
+  "List of hook functions run by `phpunit-process-setup' (see `run-hooks')."
+  :type 'hook
+  :group 'phpunit)
+
+(add-hook 'phpunit-setup-hook (lambda () (next-error-follow-minor-mode)))
+
 (setq compilation-finish-function
       (lambda (buf str)
+        (next-error-follow-minor-mode)
         (unless (string-match "exited abnormally" str)
           ;;no errors, make the compilation window go away in a few seconds
           (run-at-time
            "2 sec" nil 'delete-windows-on
            (get-buffer-create "*compilation*"))
-          (message "No Compilation Errors!"))))
+          (and (next-error-follow-minor-mode) (message "No Compilation Errors!")))))
 
 (define-compilation-mode phpunit-run-mode "PHPUnit"
-  (set (make-local-variable 'compilation-error-regexp-alist)
-       phpunit-regexp-alist)
+  (add-to-list (make-local-variable 'compilation-error-regexp-alist)
+               phpunit-regex)
   (set (make-local-variable 'compilation-error-face)
        phpunit-error-face)
   (set (make-local-variable 'compilation-warning-face)
        phpunit-warning-face)
+  (set (make-local-variable 'compilation-process-setup-function)
+       'phpunit-process-setup)
   (set (make-local-variable 'compilation-disable-input) t))
+
+(defun phpunit-process-setup ()
+  "Setup compilation variables and buffer for `phpunit'.
+Run `phpunit-setup-hook'."
+  (run-hooks 'phpunit-setup-hook))
 
 (defun phpunit-command ()
   (let ((r (eproject-root)))
@@ -32,29 +49,75 @@
                      r "app "
                      "--stop-on-failure --stop-on-error ")))
 
-(defun get-function-name ()
-  (interactive)
-  (message (symbol-name (or (symbol-at-point)
-                            (error "No function at point.")))))
+(defun phpunit-src-dir-run-command ()
+  (concat (phpunit-command) (eproject-root) "src"))
 
-(defun phpunit-method-run-command ()
+(defun phpunit-src-dir-run ()
   (interactive)
-  (let ((symbol (symbol-at-point)))
-    (if (not symbol)
-        (message "No symbol at point.")
-      (concat (phpunit-command) "--filter=" (symbol-name symbol) " " (buffer-file-name)))))
+  (phpunit-run-test (phpunit-src-dir-run-command)))
 
-(defun phpunit-file-run-command ()
-  (interactive)
-  (concat (concat (phpunit-command) (buffer-file-name))))
+(defun phpunit-file-run-command (file)
+  (concat (phpunit-command) file))
 
-(defun phpunit-file-run ()
-  (interactive)
-  (phpunit-run-test (phpunit-file-run-command)))
+(defun phpunit-file-run (file)
+  (interactive (list
+                (read-string (format "file (%s): " (buffer-file-name))
+                             nil nil (buffer-file-name))))
+  (phpunit-run-test (phpunit-file-run-command file)))
 
-(defun phpunit-method-run ()
+(defun phpunit-method-run-command (method)
+  (concat (phpunit-command) "--filter=" method " " (buffer-file-name)))
+
+(defun phpunit-method-run-method-at-point ()
   (interactive)
-  (phpunit-run-test (phpunit-method-run-command)))
+  (save-excursion
+    (beginning-of-defun)
+    (search-forward "(")
+    (backward-word)
+      (let ((symbol (symbol-at-point)))
+        (if (not symbol)
+            (message "No symbol at point.")
+          (phpunit-run-test (phpunit-method-run-command (symbol-name symbol)))))))
+
+(defun phpunit-run-any-method ()
+  (interactive)
+  (let ((ido-mode ido-mode)
+          (ido-enable-flex-matching
+           (if (boundp 'ido-enable-flex-matching)
+               ido-enable-flex-matching t))
+          name-and-pos symbol-names position)
+      (unless ido-mode
+        (ido-mode 1)
+        (setq ido-enable-flex-matching t))
+      (while (progn
+               (imenu--cleanup)
+               (setq imenu--index-alist nil)
+               (ido-goto-symbol (imenu--make-index-alist))
+               (setq selected-symbol
+                     (ido-completing-read "Symbol? " symbol-names))
+               (string= (car imenu--rescan-item) selected-symbol)))
+      (phpunit-run-test (phpunit-method-run-command selected-symbol))))
+
+(defun phpunit-directory-run-command (dir)
+  (phpunit-run-test (concat (phpunit-command) dir)))
+
+(defun phpunit-directory-run ()
+  (interactive)
+  (let ((ido-report-no-match nil)
+	(ido-auto-merge-work-directories-length -1))
+    ;; (ido-file-internal 'dired 'dired nil "Dired: " 'dir)
+    (ido-file-internal 'phpunit-directory-run-command
+                       'phpunit-directory-run-command
+                       nil
+                       "dkdk"
+                       'dir)))
+
+(defun test-directory-run ()
+  (interactive)
+  (let ((dir (ido-completing-read "Dir? " (ido-make-dir-list 'dir))))
+    (message "%s" dir)))
+
+
 
 (defun phpunit-run-test (command)
   "Runs a test with PHPUnit."
