@@ -20,7 +20,7 @@
 (require 'w3m-load)
 (setq w3m-use-cookies t)
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "chromium-browser")
+      browse-url-generic-program "firefox")
 
 (require 'ack-and-a-half)
 (defalias 'ack 'ack-and-a-half)
