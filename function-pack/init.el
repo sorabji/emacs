@@ -13,6 +13,7 @@
 (load (concat (live-pack-lib-dir) "functions.el"))
 (load (concat (live-pack-lib-dir) "inf-mongo.el"))
 (load (concat (live-pack-lib-dir) "ack-and-a-half.el"))
+(load (concat (live-pack-lib-dir) "ibuffer.el"))
 
 
 ; w3m

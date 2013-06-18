@@ -177,3 +177,10 @@ instead."
      '(lambda()
         (interactive)
         (djcb-term-start-or-switch ,name ,use-existing))))
+
+(defun acme-right-click ()
+  "search forward for the next thing-at-point"
+  (interactive)
+  (mouse-set-point (event-end ))
+  (let ((s (symbol-name (symbol-at-point))))
+    (search-forward-regexp (concat "\\b" s "\\b"))))
