@@ -9,6 +9,7 @@
 (require 'php-mode)
 (require 'php-doc nil t)
 (require 'phpunit)
+(require 'twig-mode)
 
 (setq php-doc-directory (expand-file-name "~/man/php-chunked-xhtml"))
 (add-hook 'php-mode-hook

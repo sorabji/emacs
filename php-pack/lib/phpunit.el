@@ -45,7 +45,7 @@ Run `phpunit-setup-hook'."
 
 (defun phpunit-command ()
   (let ((r (eproject-root)))
-    (concat r "vendor/bin/phpunit -c "
+    (concat r "bin/phpunit -c "
                      r "app "
                      "--stop-on-failure --stop-on-error ")))
 
@@ -59,11 +59,15 @@ Run `phpunit-setup-hook'."
 (defun phpunit-file-run-command (file)
   (concat (phpunit-command) file))
 
-(defun phpunit-file-run (file)
-  (interactive (list
-                (read-string (format "file (%s): " (buffer-file-name))
-                             nil nil (buffer-file-name))))
-  (phpunit-run-test (phpunit-file-run-command file)))
+(defun phpunit-file-run (arg)
+  (interactive "P")
+  (let ((file nil))
+    (if arg
+        (setq file (list
+                  (read-string (format "file (%s): " (buffer-file-name))
+                               nil nil (buffer-file-name))))
+      (setq file (buffer-file-name)))
+    (phpunit-run-test (phpunit-file-run-command file))))
 
 (defun phpunit-method-run-command (method)
   (concat (phpunit-command) "--filter=" method " " (buffer-file-name)))

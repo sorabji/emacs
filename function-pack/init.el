@@ -5,6 +5,7 @@
 
 (live-add-pack-lib "restclient.el")
 (live-add-pack-lib "nyan-mode")
+(live-add-pack-lib "jira.el")
 
 ;; Load bindings config
 (live-load-config-file "bindings.el")
@@ -32,3 +33,10 @@
 
 (require 'restclient)
 (require 'nyan-mode)
+
+(require 'jira)
+(setq jira-url "https://zeetomedia.atlassian.net/rpc/xmlrpc")
+
+(require 'acme-search)
+(global-set-key [(mouse-3)] 'acme-search-forward)
+(global-set-key [(shift mouse-3)] 'acme-search-backward)
