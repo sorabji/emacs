@@ -1,5 +1,6 @@
 (live-add-pack-lib "php-mode")
 (live-add-pack-lib "eproject")
+(live-add-pack-lib "php-auto-yasnippets")
 ;(live-add-pack-lib "phpunit")
 
 
@@ -21,6 +22,7 @@
                         (local-set-key (kbd "<f11>") 'phpunit-file-run)
                         (local-set-key (kbd "<f10>") 'phpunit-method-run-method-at-point)
                         (local-set-key (kbd "<f9>") 'phpunit-run-any-method)
+                        (local-set-key (kbd "C-c C-y") 'yas/create-php-snippet)
                         (set (make-local-variable 'eldoc-documentation-function)
                              'php-doc-eldoc-function)
                         (eldoc-mode 1)
@@ -42,3 +44,6 @@
   (sf-open-file "composer.json"))
 
 (live-load-config-file "bindings.el")
+
+(require 'php-auto-yasnippets)
+(setq php-auto-yasnippet-php-program (expand-file-name "~/config/emacs-live-packs/php-pack/lib/php-auto-yasnippets/Create-PHP-YASnippet.php"))
