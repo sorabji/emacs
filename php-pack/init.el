@@ -3,8 +3,6 @@
 (live-add-pack-lib "php-auto-yasnippets")
 ;(live-add-pack-lib "phpunit")
 
-
-
 (require 'compile)
 (require 'sf)
 (require 'php-mode)
@@ -26,6 +24,7 @@
                         (set (make-local-variable 'eldoc-documentation-function)
                              'php-doc-eldoc-function)
                         (eldoc-mode 1)
+                        (flymake-mode 1)
                         (define-abbrev php-mode-abbrev-table "ex" "extends"))))
 
 (defun phplint-thisfile ()

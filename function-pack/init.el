@@ -6,6 +6,7 @@
 (live-add-pack-lib "restclient.el")
 (live-add-pack-lib "nyan-mode")
 (live-add-pack-lib "jira.el")
+(live-add-pack-lib "emacs-google-this")
 
 ;; Load bindings config
 (live-load-config-file "bindings.el")
@@ -40,3 +41,6 @@
 (require 'acme-search)
 (global-set-key [(mouse-3)] 'acme-search-forward)
 (global-set-key [(shift mouse-3)] 'acme-search-backward)
+
+(require 'google-this)
+(google-this-mode 1)

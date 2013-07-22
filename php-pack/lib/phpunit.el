@@ -1,5 +1,9 @@
 (require 'eproject)
 
+(defvar phpunit-executable
+  nil
+  "points to the phpunit executable")
+
 (defvar phpunit-regex
   '("^\\(.*\\.php\\):\\([0-9]+\\)$" 1 2 nil nil 1)
   "Regexp used to match PHPUnit output. See `compilation-error-regexp-alist'.")
@@ -38,6 +42,14 @@
        'phpunit-process-setup)
   (set (make-local-variable 'compilation-disable-input) t))
 
+(defun set-phpunit-vendor-executable ()
+  (interactive)
+  (setq phpunit-executable (concat (eproject-root) "vendor/bin/phpunit ") ))
+
+(defun set-phpunit-bin-executable ()
+  (interactive)
+  (setq phpunit-executable (concat (eproject-root) "bin/phpunit ") ))
+
 (defun phpunit-process-setup ()
   "Setup compilation variables and buffer for `phpunit'.
 Run `phpunit-setup-hook'."
@@ -45,7 +57,7 @@ Run `phpunit-setup-hook'."
 
 (defun phpunit-command ()
   (let ((r (eproject-root)))
-    (concat r "bin/phpunit -c "
+    (concat phpunit-executable " -c "
                      r "app "
                      "--stop-on-failure --stop-on-error ")))
 
