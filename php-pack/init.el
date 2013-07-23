@@ -1,6 +1,7 @@
 (live-add-pack-lib "php-mode")
 (live-add-pack-lib "eproject")
 (live-add-pack-lib "php-auto-yasnippets")
+(live-add-pack-lib "emacs-eclim")
 ;(live-add-pack-lib "phpunit")
 
 (require 'compile)
@@ -46,3 +47,12 @@
 
 (require 'php-auto-yasnippets)
 (setq php-auto-yasnippet-php-program (expand-file-name "~/config/emacs-live-packs/php-pack/lib/php-auto-yasnippets/Create-PHP-YASnippet.php"))
+
+(require 'eclim)
+(require 'eclimd)
+(require 'ac-emacs-eclim-source)
+(global-eclim-mode)
+(ac-emacs-eclim-config)
+
+(setq eclim-executable (expand-file-name "~/build/eclipse/eclim"))
+(setq eclimd-executable (expand-file-name "~/build/eclipse/eclimd"))
