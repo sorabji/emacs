@@ -23,7 +23,7 @@
 (require 'w3m-load)
 (setq w3m-use-cookies t)
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "firefox")
+      browse-url-generic-program "chromium-browser")
 
 (require 'ack-and-a-half)
 (defalias 'ack 'ack-and-a-half)
@@ -44,3 +44,13 @@
 
 (require 'google-this)
 (google-this-mode 1)
+
+(require 'auto-complete)
+(require 'auto-complete-config)
+(ac-config-default)
+(global-auto-complete-mode t)
+
+;;; stupid shell scrolling
+(remove-hook 'comint-output-filter-functions 'comint-postoutput-scroll-to-bottom)
+
+(setq erc-hide-list '("JOIN" "PART" "QUIT"))
