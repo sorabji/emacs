@@ -7,6 +7,8 @@
 (live-add-pack-lib "nyan-mode")
 (live-add-pack-lib "jira.el")
 (live-add-pack-lib "emacs-google-this")
+(live-add-pack-lib "org-screenshot")
+
 
 ;; Load bindings config
 (live-load-config-file "bindings.el")
@@ -54,3 +56,6 @@
 (remove-hook 'comint-output-filter-functions 'comint-postoutput-scroll-to-bottom)
 
 (setq erc-hide-list '("JOIN" "PART" "QUIT"))
+
+
+(require 'org-screenshot)
