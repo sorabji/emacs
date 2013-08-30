@@ -55,4 +55,3 @@
 
 (setq eclim-executable (expand-file-name "~/build/eclipse/eclim"))
 (setq eclimd-executable (expand-file-name "~/build/eclipse/eclimd"))
-

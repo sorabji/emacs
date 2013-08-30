@@ -21,18 +21,17 @@
 
 
 ; w3m
-(add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
-(require 'w3m-load)
-(setq w3m-use-cookies t)
-(setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "chromium-browser")
+;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
+;; (require 'w3m-load)
+;; (setq w3m-use-cookies t)
+;; (setq browse-url-browser-function 'browse-url-generic
+;;       browse-url-generic-program "chromium-browser")
 
 (require 'ack-and-a-half)
 (defalias 'ack 'ack-and-a-half)
 (defalias 'ack-same 'ack-and-a-half-same)
 (defalias 'ack-find-file 'ack-and-a-half-find-file)
 (defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)
-
 
 (require 'restclient)
 (require 'nyan-mode)
