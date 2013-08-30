@@ -21,6 +21,7 @@
                         (local-set-key (kbd "<f11>") 'phpunit-file-run)
                         (local-set-key (kbd "<f10>") 'phpunit-method-run-method-at-point)
                         (local-set-key (kbd "<f9>") 'phpunit-run-any-method)
+                        (local-set-key (kbd "<f6>") 'phpunit-toggle-file)
                         (local-set-key (kbd "C-c C-y") 'yas/create-php-snippet)
                         (set (make-local-variable 'eldoc-documentation-function)
                              'php-doc-eldoc-function)
@@ -34,8 +35,6 @@
 
 (setq mode-compile-always-save-buffer-p t)
 (setq compilation-window-height 12)
-
-
 
 ;;open the composer.json file in a new buffer
 (defun sf-app-composer ()
@@ -51,8 +50,9 @@
 (require 'eclim)
 (require 'eclimd)
 (require 'ac-emacs-eclim-source)
-(global-eclim-mode)
-(ac-emacs-eclim-config)
+; (global-eclim-mode)
+; (ac-emacs-eclim-config)
 
 (setq eclim-executable (expand-file-name "~/build/eclipse/eclim"))
 (setq eclimd-executable (expand-file-name "~/build/eclipse/eclimd"))
+

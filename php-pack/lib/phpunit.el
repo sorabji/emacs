@@ -55,6 +55,29 @@
 Run `phpunit-setup-hook'."
   (run-hooks 'phpunit-setup-hook))
 
+(defun phpunit-toggle-file ()
+  "top level of this"
+  (interactive)
+  (if (not (phpunit-find-test-file))
+      (phpunit-find-file)))
+
+(defun phpunit-find-test-file ()
+  "hopes to find the corresponding phpunit test file. may depend heavily on symfony bundle structure (shrug)"
+  (let* ((file (buffer-file-name))
+         (test-dir (replace-regexp-in-string "Bundle/" "Bundle/Tests/" file))
+         (fin (replace-regexp-in-string ".php" "Test.php" test-dir)))
+    (if (file-exists-p fin)
+        (find-file fin))))
+
+(defun phpunit-find-file ()
+  "hopes to find the corresponding file for a phpunit test file. likely depends heavily on symfony bundle structure (shrug)
+"
+  (let* ((file (buffer-file-name))
+         (test-dir (replace-regexp-in-string "Bundle/Tests/" "Bundle/" file))
+         (fin (replace-regexp-in-string "Test.php" ".php" test-dir)))
+    (if (file-exists-p fin)
+        (find-file fin))))
+
 (defun phpunit-command ()
   (let ((r (eproject-root)))
     (concat phpunit-executable " -c "
