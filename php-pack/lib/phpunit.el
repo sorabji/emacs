@@ -1,8 +1,20 @@
 (require 'eproject)
 
 (defvar phpunit-executable
-  nil
+  "phpunit"
   "points to the phpunit executable")
+
+(defvar phpunit-debug
+  nil
+  "debug mode?")
+
+(defvar phpunit-clear-sf-cache
+  nil
+  "clear cache before running?")
+
+(defvar phpunit-drop-database
+  nil
+  "drop database before running?")
 
 (defvar phpunit-regex
   '("^\\(.*\\.php\\):\\([0-9]+\\)$" 1 2 nil nil 1)
@@ -42,6 +54,34 @@
        'phpunit-process-setup)
   (set (make-local-variable 'compilation-disable-input) t))
 
+(defun phpunit-toggle-debug ()
+  (interactive)
+  (setq phpunit-debug (not phpunit-debug))
+  (message "%s" (if phpunit-debug
+                    "debugging"
+                  "not debugging")))
+
+(defun phpunit-toggle-clear-sf-cache ()
+  (interactive)
+  (setq phpunit-clear-sf-cache (not phpunit-clear-sf-cache))
+  (message "%s" (if phpunit-clear-sf-cache
+                    "clearing cache"
+                  "no cache clear")))
+
+(defun phpunit-toggle-drop-database ()
+  (interactive)
+  (setq phpunit-drop-database (not phpunit-drop-database))
+  (message "%s" (if phpunit-drop-database
+                    "dropping database"
+                  "not dropping database")))
+
+(defun phpunit-status ()
+  (interactive)
+  (let ((debug (if phpunit-debug "debug" "no debug"))
+        (cache (if phpunit-clear-sf-cache "clear cache" "no cache"))
+        (db (if phpunit-drop-database "drop db" "no db")))
+    (message "%s" (mapconcat 'identity (list debug cache db) "\n"))))
+
 (defun set-phpunit-vendor-executable ()
   (interactive)
   (setq phpunit-executable (concat (eproject-root) "vendor/bin/phpunit ") ))
@@ -79,8 +119,15 @@ Run `phpunit-setup-hook'."
         (find-file fin))))
 
 (defun phpunit-command ()
-  (let ((r (eproject-root)))
-    (concat phpunit-executable " -c "
+  (interactive)
+  (let* ((r (eproject-root))
+         (cd (concat "cd " r " && "))
+         (cc (if phpunit-clear-sf-cache "sf-clean.sh && " ""))
+         (db (if phpunit-drop-database
+                (concat r "bin/cleanEnv.sh && ")
+               ""))
+         (xd (if phpunit-debug "XDEBUG_CONFIG=jk " "")))
+    (concat cd cc db xd phpunit-executable " -c "
                      r "app "
                      "--stop-on-failure --stop-on-error ")))
 
@@ -138,6 +185,7 @@ Run `phpunit-setup-hook'."
       (phpunit-run-test (phpunit-method-run-command selected-symbol))))
 
 (defun phpunit-directory-run-command (dir)
+  (interactive (list (read-directory-name "sDir: ")))
   (phpunit-run-test (concat (phpunit-command) dir)))
 
 (defun phpunit-directory-run ()

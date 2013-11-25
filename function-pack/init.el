@@ -14,6 +14,7 @@
 (load (concat (live-pack-lib-dir) "inf-mongo.el"))
 (load (concat (live-pack-lib-dir) "ack-and-a-half.el"))
 (load (concat (live-pack-lib-dir) "ibuffer.el"))
+(load (concat (live-pack-lib-dir) "etags-search.el"))
 
 (live-load-config-file "bindings.el")
 (live-load-config-file "org-mode.el")
