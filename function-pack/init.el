@@ -9,6 +9,7 @@
 (live-add-pack-lib "emacs-google-this")
 (live-add-pack-lib "org-screenshot")
 (live-add-pack-lib "elfeed")
+(live-add-pack-lib "twittering-mode")
 
 (load (concat (live-pack-lib-dir) "functions.el"))
 (load (concat (live-pack-lib-dir) "inf-mongo.el"))
@@ -55,7 +56,13 @@
 ;;; stupid shell scrolling
 (remove-hook 'comint-output-filter-functions 'comint-postoutput-scroll-to-bottom)
 
-(setq erc-hide-list '("JOIN" "PART" "QUIT"))
+(setq erc-hide-list '("JOIN"))
 
 
 (require 'org-screenshot)
+
+(require 'twittering-mode)
+(setq twittering-use-master-password t)
+(setq twittering-icon-mode t)
+(setq twittering-convert-fix-size 48)
+(setq twittering-use-icon-storage t)

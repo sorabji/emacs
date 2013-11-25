@@ -3,6 +3,7 @@
 (live-add-pack-lib "php-auto-yasnippets")
 (live-add-pack-lib "geben-on-emacs")
 (live-add-pack-lib "ecb")
+(live-add-pack-lib "php-boris")
 
 (require 'compile)
 (require 'sf)
@@ -71,3 +72,5 @@
 ;;                         ,(expand-file-name "~/dev/")
 ;;                         ,(expand-file-name "~/dev/zeeto/")))
 ;; (setq ecb-source-path nil)
+
+(require 'php-boris)

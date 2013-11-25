@@ -53,7 +53,7 @@
         (url-request-data entity))
 
     (restclient-restore-header-variables)
-    
+
     (dolist (header headers)
       (let* ((mapped (assoc-string (downcase (car header))
                                    '(("from" . url-personal-mail-address)
@@ -61,7 +61,7 @@
                                      ("accept-charset" . url-mime-charset-string)
                                      ("accept-language" . url-mime-language-string)
                                      ("accept" . url-mime-accept-string)))))
-        
+
         (if mapped
             (set (cdr mapped) (cdr header))
           (setq url-request-extra-headers (cons header url-request-extra-headers)))
@@ -173,6 +173,9 @@
 (defconst restclient-header-regexp
   "^\\([^ :]+\\): \\(.*\\)$")
 
+(defconst restclient-var-regexp
+  "^\\(:[^: ]+\\) = \\(.+\\)$")
+
 (defun restclient-current-min ()
   (save-excursion
 	(beginning-of-line)
@@ -189,6 +192,30 @@
 		(point-at-bol)
 	  (point-max))))
 
+(defun restclient-replace-all-in-string (replacements s)
+  (if replacements
+      (replace-regexp-in-string (regexp-opt (mapcar 'car replacements))
+                                (lambda (key) (cdr (assoc key replacements)))
+                                s)
+    s))
+
+(defun restclient-replace-all-in-header (replacements header)
+  (cons (car header)
+        (restclient-replace-all-in-string replacements (cdr header))))
+
+(defun restclient-replace-all-in-headers (replacements headers)
+  (mapcar (apply-partially 'restclient-replace-all-in-header vars) headers))
+
+(defun restclient-find-vars-before-point ()
+  (let ((vars nil)
+        (bound (point)))
+    (save-excursion
+      (goto-char (point-min))
+      (while (search-forward-regexp restclient-var-regexp bound t)
+        (let ((name (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
+              (value (buffer-substring-no-properties (match-beginning 2) (match-end 2))))
+          (setq vars (cons (cons name value) vars))))
+      vars)))
 
 ;;;###autoload
 (defun restclient-http-send-current (&optional raw)
@@ -207,7 +234,11 @@
 			  (forward-line))
 			(when (looking-at "^\\s-*$")
 			  (forward-line))
-			(let ((entity (buffer-substring (point) (restclient-current-max))))
+			(let* ((entity (buffer-substring (point) (restclient-current-max)))
+			       (vars (restclient-find-vars-before-point))
+			       (url (restclient-replace-all-in-string vars url))
+			       (headers (restclient-replace-all-in-headers vars headers))
+			       (entity (restclient-replace-all-in-string vars entity)))
 			  (message "HTTP %s %s Headers:[%s] Body:[%s]" method url headers entity)
 			  (restclient-http-do method url headers entity raw))))))
 
@@ -219,7 +250,7 @@
 (setq restclient-mode-keywords
 	  (list (list restclient-method-url-regexp '(1 font-lock-keyword-face) '(2 font-lock-function-name-face))
 			(list restclient-header-regexp '(1 font-lock-variable-name-face) '(2 font-lock-string-face))
-
+			(list restclient-var-regexp '(1 font-lock-variable-name-face) '(2 font-lock-string-face))
 			))
 
 (defvar restclient-mode-syntax-table
