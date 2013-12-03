@@ -68,9 +68,9 @@
 
 (setq stack-trace-on-error t)
 
-;; (setq ecb-source-path `(
-;;                         ,(expand-file-name "~/dev/")
-;;                         ,(expand-file-name "~/dev/zeeto/")))
+(setq ecb-source-path `(
+                        ,(expand-file-name "~/dev/")
+                        ,(expand-file-name "~/dev/zeeto/")))
 ;; (setq ecb-source-path nil)
 
 (require 'php-boris)

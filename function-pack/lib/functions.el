@@ -147,7 +147,7 @@ instead."
 (defun php-cs-file ()
   (interactive)
   (shell-command (concat "php-cs-fixer fix " (buffer-file-name)))
-  (revert-buffer))
+  (revert-buffer t t))
 
 (defun php-cs-list-errors ()
   (interactive)

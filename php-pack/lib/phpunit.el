@@ -16,6 +16,10 @@
   nil
   "drop database before running?")
 
+(defvar phpunit-stop-on-fail
+  t
+  "stop on fail?")
+
 (defvar phpunit-regex
   '("^\\(.*\\.php\\):\\([0-9]+\\)$" 1 2 nil nil 1)
   "Regexp used to match PHPUnit output. See `compilation-error-regexp-alist'.")
@@ -75,12 +79,18 @@
                     "dropping database"
                   "not dropping database")))
 
+(defun phpunit-toggle-stop-on-fail ()
+  (interactive)
+  (setq phpunit-stop-on-fail (not phpunit-stop-on-fail))
+  (message "%s" (if phpunit-stop-on-fail "stopping on fail" "not stopping on fail")))
+
 (defun phpunit-status ()
   (interactive)
   (let ((debug (if phpunit-debug "debug" "no debug"))
         (cache (if phpunit-clear-sf-cache "clear cache" "no cache"))
-        (db (if phpunit-drop-database "drop db" "no db")))
-    (message "%s" (mapconcat 'identity (list debug cache db) "\n"))))
+        (db (if phpunit-drop-database "drop db" "no db"))
+        (of (if phpunit-stop-on-fail "stop on fail" "no stop on fail")))
+    (message "%s" (mapconcat 'identity (list debug cache db of) "\n"))))
 
 (defun set-phpunit-vendor-executable ()
   (interactive)
@@ -110,8 +120,7 @@ Run `phpunit-setup-hook'."
         (find-file fin))))
 
 (defun phpunit-find-file ()
-  "hopes to find the corresponding file for a phpunit test file. likely depends heavily on symfony bundle structure (shrug)
-"
+  "hopes to find the corresponding file for a phpunit test file. likely depends heavily on symfony bundle structure (shrug)"
   (let* ((file (buffer-file-name))
          (test-dir (replace-regexp-in-string "Bundle/Tests/" "Bundle/" file))
          (fin (replace-regexp-in-string "Test.php" ".php" test-dir)))
@@ -123,13 +132,12 @@ Run `phpunit-setup-hook'."
   (let* ((r (eproject-root))
          (cd (concat "cd " r " && "))
          (cc (if phpunit-clear-sf-cache "sf-clean.sh && " ""))
-         (db (if phpunit-drop-database
-                (concat r "bin/cleanEnv.sh && ")
-               ""))
-         (xd (if phpunit-debug "XDEBUG_CONFIG=jk " "")))
+         (db (if phpunit-drop-database (concat r "bin/cleanEnv.sh && ") ""))
+         (xd (if phpunit-debug "XDEBUG_CONFIG=jk " ""))
+         (of (if phpunit-stop-on-fail "--stop-on-failure --stop-on-error " "")))
     (concat cd cc db xd phpunit-executable " -c "
                      r "app "
-                     "--stop-on-failure --stop-on-error ")))
+                     of)))
 
 (defun phpunit-src-dir-run-command ()
   (concat (phpunit-command) (eproject-root) "src"))
