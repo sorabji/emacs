@@ -7,7 +7,7 @@
 (live-add-pack-lib "nyan-mode")
 (live-add-pack-lib "jira.el")
 (live-add-pack-lib "emacs-google-this")
-(live-add-pack-lib "org-screenshot")
+;(live-add-pack-lib "org-screenshot")
 (live-add-pack-lib "elfeed")
 (live-add-pack-lib "twittering-mode")
 
@@ -18,7 +18,7 @@
 (load (concat (live-pack-lib-dir) "etags-search.el"))
 
 (live-load-config-file "bindings.el")
-(live-load-config-file "org-mode.el")
+;(live-load-config-file "org-mode.el")
 (live-load-config-file "elfeed.el")
 
 ; w3m
@@ -59,10 +59,22 @@
 (setq erc-hide-list '("JOIN"))
 
 
-(require 'org-screenshot)
+;(require 'org-screenshot)
 
 (require 'twittering-mode)
 (setq twittering-use-master-password t)
 (setq twittering-icon-mode t)
 (setq twittering-convert-fix-size 48)
 (setq twittering-use-icon-storage t)
+
+
+(sml/setup)
+(ido-vertical-mode)
+(diminish 'eldoc-mode)
+(diminish 'auto-complete-mode)
+(diminish 'paredit-mode)
+(diminish 'elisp-slime-nav-mode)
+(diminish 'google-this-mode)
+(diminish 'undo-tree-mode)
+(diminish 'git-gutter-mode)
+(diminish 'yas-minor-mode)
