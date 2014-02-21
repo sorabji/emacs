@@ -48,21 +48,24 @@
 (require 'php-auto-yasnippets)
 (setq php-auto-yasnippet-php-program (expand-file-name "~/config/emacs-live-packs/php-pack/lib/php-auto-yasnippets/Create-PHP-YASnippet.php"))
 
-(require 'geben)
+(when (string= (getenv "GEBENP") "geben")
+  (require 'geben)
 
-(setq geben-pause-at-entry-line nil)
+  (setq geben-pause-at-entry-line nil)
 
-(defun my-geben-breakpoints (session)
-  (message "Setting debugger breakpoints.")
-  (geben-set-breakpoint-call "debugger"))
-(add-hook 'geben-dbgp-init-hook #'my-geben-breakpoints t)
+  (defun my-geben-breakpoints (session)
+    (message "Setting debugger breakpoints.")
+    (geben-set-breakpoint-call "debugger"))
+  (add-hook 'geben-dbgp-init-hook #'my-geben-breakpoints t)
 
-(defun my-geben-release ()
-  (interactive)
-  (geben-stop)
-  (dolist (session geben-sessions)
-    (ignore-errors
-      (geben-session-release session))))
+  (defun my-geben-release ()
+    (interactive)
+    (geben-stop)
+    (dolist (session geben-sessions)
+      (ignore-errors
+        (geben-session-release session)))))
+
+
 
 (require 'ecb)
 

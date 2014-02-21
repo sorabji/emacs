@@ -20,6 +20,14 @@
   t
   "stop on fail?")
 
+(defvar phpunit-generate-coverage
+  nil
+  "generate code coverage?")
+
+(defvar phpunit-testdox
+  nil
+  "generate code coverage?")
+
 (defvar phpunit-regex
   '("^\\(.*\\.php\\):\\([0-9]+\\)$" 1 2 nil nil 1)
   "Regexp used to match PHPUnit output. See `compilation-error-regexp-alist'.")
@@ -84,13 +92,25 @@
   (setq phpunit-stop-on-fail (not phpunit-stop-on-fail))
   (message "%s" (if phpunit-stop-on-fail "stopping on fail" "not stopping on fail")))
 
+(defun phpunit-toggle-code-coverage ()
+  (interactive)
+  (setq phpunit-generate-coverage (not phpunit-generate-coverage))
+  (message "%s" (if phpunit-generate-coverage "generating coverage" "no coverage report")))
+
+(defun phpunit-toggle-testdox ()
+  (interactive)
+  (setq phpunit-testdox (not phpunit-testdox))
+  (message "%s" (if phpunit-testdox "testdox output" "standard output")))
+
 (defun phpunit-status ()
   (interactive)
   (let ((debug (if phpunit-debug "debug" "no debug"))
         (cache (if phpunit-clear-sf-cache "clear cache" "no cache"))
         (db (if phpunit-drop-database "drop db" "no db"))
-        (of (if phpunit-stop-on-fail "stop on fail" "no stop on fail")))
-    (message "%s" (mapconcat 'identity (list debug cache db of) "\n"))))
+        (of (if phpunit-stop-on-fail "stop on fail" "no stop on fail"))
+        (co (if phpunit-generate-coverage "generate coverage" "no coverage report"))
+        (td (if phpunit-testdox "testdox output" "standard output")))
+    (message "%s" (mapconcat 'identity (list debug cache db of co td) "\n"))))
 
 (defun set-phpunit-vendor-executable ()
   (interactive)
@@ -134,10 +154,14 @@ Run `phpunit-setup-hook'."
          (cc (if phpunit-clear-sf-cache "sf-clean.sh && " ""))
          (db (if phpunit-drop-database (concat r "bin/cleanEnv.sh && ") ""))
          (xd (if phpunit-debug "XDEBUG_CONFIG=jk " ""))
-         (of (if phpunit-stop-on-fail "--stop-on-failure --stop-on-error " "")))
+         (of (if phpunit-stop-on-fail "--stop-on-failure --stop-on-error " ""))
+         (co (if phpunit-generate-coverage (concat "--coverage-html " r "app/logs/report/ ") ""))
+         (td (if phpunit-testdox "--testdox " "")))
     (concat cd cc db xd phpunit-executable " -c "
                      r "app "
-                     of)))
+                     of
+                     co
+                     td)))
 
 (defun phpunit-src-dir-run-command ()
   (concat (phpunit-command) (eproject-root) "src"))

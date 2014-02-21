@@ -8,7 +8,7 @@
 (live-add-pack-lib "jira.el")
 (live-add-pack-lib "emacs-google-this")
 ;(live-add-pack-lib "org-screenshot")
-(live-add-pack-lib "elfeed")
+;(live-add-pack-lib "elfeed")
 (live-add-pack-lib "twittering-mode")
 
 (load (concat (live-pack-lib-dir) "functions.el"))
@@ -19,7 +19,7 @@
 
 (live-load-config-file "bindings.el")
 ;(live-load-config-file "org-mode.el")
-(live-load-config-file "elfeed.el")
+;(live-load-config-file "elfeed.el")
 
 ; w3m
 ;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
@@ -52,6 +52,7 @@
 (require 'auto-complete-config)
 (ac-config-default)
 (global-auto-complete-mode t)
+(setq ac-disable-faces nil)             ;completion in alltheplaces!
 
 ;;; stupid shell scrolling
 (remove-hook 'comint-output-filter-functions 'comint-postoutput-scroll-to-bottom)
