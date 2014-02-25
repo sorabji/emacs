@@ -1,32 +1,6 @@
-(require 'eproject)
-
 (defvar phpunit-executable
   "phpunit"
   "points to the phpunit executable")
-
-(defvar phpunit-debug
-  nil
-  "debug mode?")
-
-(defvar phpunit-clear-sf-cache
-  nil
-  "clear cache before running?")
-
-(defvar phpunit-drop-database
-  nil
-  "drop database before running?")
-
-(defvar phpunit-stop-on-fail
-  t
-  "stop on fail?")
-
-(defvar phpunit-generate-coverage
-  nil
-  "generate code coverage?")
-
-(defvar phpunit-testdox
-  nil
-  "generate code coverage?")
 
 (defvar phpunit-regex
   '("^\\(.*\\.php\\):\\([0-9]+\\)$" 1 2 nil nil 1)
@@ -43,13 +17,18 @@
   :type 'hook
   :group 'phpunit)
 
-(add-hook 'phpunit-setup-hook (lambda () (next-error-follow-minor-mode)))
+(defvar phpunit-toggle-switches
+  nil
+  "list of phpunit switches in format (var (on-msg on-switch) (off-msg off-switch))")
+
+(defvar phpunit-env-toggles
+  nil
+  "list of commands to run before phpunit, same format as phpunit-toggle-switches")
 
 (setq compilation-finish-function
       (lambda (buf str)
         (next-error-follow-minor-mode)
         (unless (string-match "exited abnormally" str)
-          ;;no errors, make the compilation window go away in a few seconds
           (run-at-time
            "2 sec" nil 'delete-windows-on
            (get-buffer-create "*compilation*"))
@@ -66,64 +45,46 @@
        'phpunit-process-setup)
   (set (make-local-variable 'compilation-disable-input) t))
 
-(defun phpunit-toggle-debug ()
-  (interactive)
-  (setq phpunit-debug (not phpunit-debug))
-  (message "%s" (if phpunit-debug
-                    "debugging"
-                  "not debugging")))
-
-(defun phpunit-toggle-clear-sf-cache ()
-  (interactive)
-  (setq phpunit-clear-sf-cache (not phpunit-clear-sf-cache))
-  (message "%s" (if phpunit-clear-sf-cache
-                    "clearing cache"
-                  "no cache clear")))
-
-(defun phpunit-toggle-drop-database ()
-  (interactive)
-  (setq phpunit-drop-database (not phpunit-drop-database))
-  (message "%s" (if phpunit-drop-database
-                    "dropping database"
-                  "not dropping database")))
-
-(defun phpunit-toggle-stop-on-fail ()
-  (interactive)
-  (setq phpunit-stop-on-fail (not phpunit-stop-on-fail))
-  (message "%s" (if phpunit-stop-on-fail "stopping on fail" "not stopping on fail")))
-
-(defun phpunit-toggle-code-coverage ()
-  (interactive)
-  (setq phpunit-generate-coverage (not phpunit-generate-coverage))
-  (message "%s" (if phpunit-generate-coverage "generating coverage" "no coverage report")))
-
-(defun phpunit-toggle-testdox ()
-  (interactive)
-  (setq phpunit-testdox (not phpunit-testdox))
-  (message "%s" (if phpunit-testdox "testdox output" "standard output")))
-
-(defun phpunit-status ()
-  (interactive)
-  (let ((debug (if phpunit-debug "debug" "no debug"))
-        (cache (if phpunit-clear-sf-cache "clear cache" "no cache"))
-        (db (if phpunit-drop-database "drop db" "no db"))
-        (of (if phpunit-stop-on-fail "stop on fail" "no stop on fail"))
-        (co (if phpunit-generate-coverage "generate coverage" "no coverage report"))
-        (td (if phpunit-testdox "testdox output" "standard output")))
-    (message "%s" (mapconcat 'identity (list debug cache db of co td) "\n"))))
-
-(defun set-phpunit-vendor-executable ()
-  (interactive)
-  (setq phpunit-executable (concat (eproject-root) "vendor/bin/phpunit ") ))
-
-(defun set-phpunit-bin-executable ()
-  (interactive)
-  (setq phpunit-executable (concat (eproject-root) "bin/phpunit ") ))
-
 (defun phpunit-process-setup ()
   "Setup compilation variables and buffer for `phpunit'.
 Run `phpunit-setup-hook'."
   (run-hooks 'phpunit-setup-hook))
+
+(defmacro phpunit-toggle (name on-msg on-switch off-msg &optional before)
+  (let ((func (intern (concat "phpunit-toggle-" name)))
+        (var (intern (concat "phpunit-" name)))
+        (which-list (if before 'phpunit-env-toggles 'phpunit-toggle-switches)))
+    `(list
+      (defvar ,var nil)
+      (add-to-list ',which-list '(,var (,on-msg ,on-switch) (,off-msg "")) t)
+      (defun ,func ()
+        (interactive)
+        (setq ,var (not ,var))
+        (message "%s" (if ,var ,on-msg ,off-msg))))))
+
+(defun phpunit-get-toggle-msg (arg)
+  (let ((var (symbol-value (first arg)))
+        (on (first (second arg)))
+        (off (first (third arg))))
+    (if var on off)))
+
+(defun phpunit-get-toggle-switch (arg)
+  (let ((var (symbol-value (first arg)))
+        (on (second (second arg)))
+        (off (second (third arg))))
+    (if var on off)))
+
+(defun phpunit-status ()
+  (interactive)
+  (message "%s" (concat (mapconcat 'phpunit-get-toggle-msg phpunit-env-toggles "\n")
+                        (mapconcat 'phpunit-get-toggle-msg phpunit-toggle-switches "\n"))))
+
+(phpunit-toggle "debug" "debugging" "XDEBUG_CONFIG=jk " "not debugging" t)
+(phpunit-toggle "clear-sf-cache" "clearing cache" "sf-clean.sh && " "not clearing cache" t)
+(phpunit-toggle "drop-database" "dropping database" "bin/cleanEnv.sh && " "not dropping database" t)
+(phpunit-toggle "stop-on-fail" "stop on fail" "--stop-on-failure --stop-on-error " "not stopping")
+(phpunit-toggle "generate-coverage" "coverage" "--coverage-html /tmp/coverage/ " "no coverage")
+(phpunit-toggle "testdox" "testdox" "--testdox " "no testdox")
 
 (defun phpunit-toggle-file ()
   "top level of this"
@@ -147,24 +108,19 @@ Run `phpunit-setup-hook'."
     (if (file-exists-p fin)
         (find-file fin))))
 
+(defun phpunit-root ()
+  (locate-dominating-file (buffer-file-name) ".gitignore" ))
+
 (defun phpunit-command ()
   (interactive)
-  (let* ((r (eproject-root))
-         (cd (concat "cd " r " && "))
-         (cc (if phpunit-clear-sf-cache "sf-clean.sh && " ""))
-         (db (if phpunit-drop-database (concat r "bin/cleanEnv.sh && ") ""))
-         (xd (if phpunit-debug "XDEBUG_CONFIG=jk " ""))
-         (of (if phpunit-stop-on-fail "--stop-on-failure --stop-on-error " ""))
-         (co (if phpunit-generate-coverage (concat "--coverage-html " r "app/logs/report/ ") ""))
-         (td (if phpunit-testdox "--testdox " "")))
-    (concat cd cc db xd phpunit-executable " -c "
-                     r "app "
-                     of
-                     co
-                     td)))
+  (concat
+   "cd " (phpunit-root) " && "
+   (mapconcat 'phpunit-get-toggle-switch phpunit-env-toggles " ")
+   phpunit-executable " -c app/ "
+   (mapconcat 'phpunit-get-toggle-switch phpunit-toggle-switches " ")))
 
 (defun phpunit-src-dir-run-command ()
-  (concat (phpunit-command) (eproject-root) "src"))
+  (concat (phpunit-command) (phpunit-root) "src"))
 
 (defun phpunit-src-dir-run ()
   (interactive)
@@ -219,24 +175,6 @@ Run `phpunit-setup-hook'."
 (defun phpunit-directory-run-command (dir)
   (interactive (list (read-directory-name "sDir: ")))
   (phpunit-run-test (concat (phpunit-command) dir)))
-
-(defun phpunit-directory-run ()
-  (interactive)
-  (let ((ido-report-no-match nil)
-	(ido-auto-merge-work-directories-length -1))
-    ;; (ido-file-internal 'dired 'dired nil "Dired: " 'dir)
-    (ido-file-internal 'phpunit-directory-run-command
-                       'phpunit-directory-run-command
-                       nil
-                       "dkdk"
-                       'dir)))
-
-(defun test-directory-run ()
-  (interactive)
-  (let ((dir (ido-completing-read "Dir? " (ido-make-dir-list 'dir))))
-    (message "%s" dir)))
-
-
 
 (defun phpunit-run-test (command)
   "Runs a test with PHPUnit."
