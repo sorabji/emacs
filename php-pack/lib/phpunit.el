@@ -181,4 +181,14 @@ Run `phpunit-setup-hook'."
   (interactive)
   (compilation-start command 'phpunit-run-mode))
 
+(defun phpunit-watch-hook ()
+  (interactive)
+  (when (eq major-mode 'php-mode)
+    (if (get-buffer "*phpunit-run*")
+       (save-current-buffer
+         (set-buffer "*phpunit-run*")
+         (recompile)))))
+
+(add-hook 'after-save-hook 'phpunit-watch-hook)
+
 (provide 'phpunit)
