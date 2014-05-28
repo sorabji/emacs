@@ -48,7 +48,8 @@
 (require 'php-auto-yasnippets)
 (setq php-auto-yasnippet-php-program (expand-file-name "~/config/emacs-live-packs/php-pack/lib/php-auto-yasnippets/Create-PHP-YASnippet.php"))
 
-(when (string= (getenv "GEBENP") "geben")
+(defun my-require-geben ()
+  (interactive)
   (require 'geben)
 
   (setq geben-pause-at-entry-line nil)
@@ -64,8 +65,6 @@
     (dolist (session geben-sessions)
       (ignore-errors
         (geben-session-release session)))))
-
-
 
 (require 'ecb)
 
