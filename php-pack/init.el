@@ -28,7 +28,8 @@
                              'php-doc-eldoc-function)
                         (eldoc-mode 1)
                         (flymake-mode 1)
-                        (define-abbrev php-mode-abbrev-table "ex" "extends"))))
+                        (define-abbrev php-mode-abbrev-table "ex" "extends")
+                        (discover--turn-on-phpunit))))
 
 (defun phplint-thisfile ()
   (interactive)
@@ -76,3 +77,14 @@
 ;; (setq ecb-source-path nil)
 
 (require 'php-boris)
+
+(defun gif-brunch-server ()
+  (interactive)
+  (let ((buf "*gif-brunch*"))
+    (if (get-buffer buf)
+        (save-current-buffer
+          (set-buffer buf)
+          (erase-buffer)))
+    (start-process-shell-command buf buf
+                                 "cd ~/dev/getitfree/admin &&" "brunch" " watch -s")
+    (browse-url "http://localhost:3333")))

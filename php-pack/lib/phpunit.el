@@ -191,4 +191,34 @@ Run `phpunit-setup-hook'."
 
 (add-hook 'after-save-hook 'phpunit-watch-hook)
 
+(defun phpunit-coverage-server ()
+  (interactive)
+  (let ((buf "*phpunit-coverage-server*"))
+    (if (get-buffer buf)
+        (save-current-buffer
+          (set-buffer buf)
+          (erase-buffer)))
+    (start-process-shell-command buf buf
+                                 "cd /tmp/coverage && " "python" " -m" " SimpleHTTPServer")
+    (browse-url "http://localhost:8000")))
+
+(discover-add-context-menu
+ :context-menu '(phpunit
+                 (description "Testing Functions")
+                 (lisp-switches
+                  ("-d" "debug" phpunit-debug t nil)
+                  ("-s" "stop on error/failure" phpunit-stop-on-fail t nil)
+                  ("-cov" "code coverage" phpunit-generate-coverage t nil)
+                  ("-testdox" "testdox" phpunit-testdox t nil))
+                 (actions
+                  ("Functions"
+                   ("`" "Insert `" (lambda () (interactive) (insert "`")))
+                   ("m" "Run Current Method" phpunit-method-run-method-at-point)
+                   ("f" "Run All Tests Current File" phpunit-file-run)
+                   ("a" "Run All Tests" phpunit-src-dir-run)
+                   ("d" "Run All Tests In Directory" phpunit-directory-run-command)
+                   ("v" "Revert buffer" revert-buffer)
+                   )))
+ :bind "`")
+
 (provide 'phpunit)
