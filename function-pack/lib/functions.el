@@ -184,3 +184,19 @@ instead."
   (mouse-set-point (event-end ))
   (let ((s (symbol-name (symbol-at-point))))
     (search-forward-regexp (concat "\\b" s "\\b"))))
+
+(defun add-code-review-note ()
+  "Add note for current file and line number"
+  (interactive)
+  (let ((file-name (buffer-file-name))
+        (file-line (line-number-at-pos)))
+    (switch-to-buffer-other-window (get-buffer-create "NOTES.org"))
+    (goto-char (point-min))
+    (when (not (search-forward "-*- mode:compilation-shell-minor"
+                               nil t))
+      (compilation-shell-minor-mode 1)
+      (insert "-*- mode:compilation-shell-minor -*-\n\n"))
+    (goto-char (point-max))
+    (if (/= (current-column) 0)
+        (newline))
+    (insert file-name ":" (number-to-string file-line) ": ")))

@@ -10,6 +10,7 @@
 ;(live-add-pack-lib "org-screenshot")
 ;(live-add-pack-lib "elfeed")
 (live-add-pack-lib "twittering-mode")
+;(live-add-pack-lib "sublimity")
 
 (load (concat (live-pack-lib-dir) "functions.el"))
 (load (concat (live-pack-lib-dir) "inf-mongo.el"))
@@ -18,7 +19,7 @@
 (load (concat (live-pack-lib-dir) "etags-search.el"))
 
 (live-load-config-file "bindings.el")
-;(live-load-config-file "org-mode.el")
+(live-load-config-file "org-mode.el")
 ;(live-load-config-file "elfeed.el")
 
 ; w3m
@@ -79,3 +80,79 @@
 (diminish 'undo-tree-mode)
 (diminish 'git-gutter-mode)
 (diminish 'yas-minor-mode)
+
+(require 'swoop)
+(global-set-key (kbd "C-o")   'swoop)
+(global-set-key (kbd "C-M-o") 'swoop-multi)
+(global-set-key (kbd "M-o")   'swoop-pcre-regexp)
+(global-set-key (kbd "C-S-o") 'swoop-back-to-last-position)
+(define-key isearch-mode-map (kbd "C-o") 'swoop-from-isearch)
+(define-key swoop-map (kbd "C-o") 'swoop-multi-from-swoop)
+(setq swoop-font-size-change: nil)
+
+(setq iswitchb-default-method 'samewindow)
+
+(defun c++-ac-init ()
+  (require 'auto-complete-c-headers)
+  (add-to-list 'ac-sources 'ac-source-c-headers)
+  (add-to-list 'ac-sources 'ac-source-semantic))
+
+(add-hook 'c++-mode-hook 'c++-ac-init )
+
+;; (semantic-mode 1)
+
+;; (require 'sublimity)
+;; (require 'sublimity-scroll)
+;; (require 'sublimity-map)
+;(require 'sublimity-attractive)
+
+;; (sublimity-mode 1)
+
+;; (setq sublimity-scroll-drift-length 5)
+;; (sublimity-map-set-delay nil)
+
+(defun ibuffer-enable-vc-groups ()
+  (ibuffer-vc-set-filter-groups-by-vc-root)
+    (unless (eq ibuffer-sorting-mode 'alphabetic)
+      (ibuffer-do-sort-by-alphabetic)))
+
+(add-hook 'ibuffer-hook 'ibuffer-enable-vc-groups)
+
+(setq magit-status-buffer-switch-function 'switch-to-buffer)
+
+
+(defun spotify-linux-command (command-name)
+  "Execute command for Spotify"
+  (interactive)
+  (setq command-text (format "%s%s"
+                             "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player."
+                             command-name))
+  (shell-command command-text))
+
+(defun spotify-toggle ()
+  "Play/Pause Spotify"
+  (interactive)
+  (spotify-linux-command "PlayPause"))
+
+(defun spotify-previous ()
+  "Starts the song over in Spotify"
+  (interactive)
+  (spotify-linux-command "Previous"))
+
+(defun spotify-next ()
+  "Next song in Spotify"
+  (interactive)
+  (spotify-linux-command "Next"))
+
+(global-set-key (kbd "<XF86AudioPlay>") 'spotify-toggle)
+(global-set-key (kbd "<XF86AudioNext>") 'spotify-next)
+(global-set-key (kbd "<XF86AudioPrev>") 'spotify-previous)
+
+
+(setq js2-basic-offset 2)
+(setq js2-bounce-indent-p t)
+
+(require 'edit-server)
+(edit-server-start)
+
+(setq ham-mode-markdown-command '("/usr/bin/markdown" file))
