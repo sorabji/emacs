@@ -27,7 +27,7 @@
 ;; (require 'w3m-load)
 ;; (setq w3m-use-cookies t)
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "chromium-browser")
+      browse-url-generic-program "google-chrome-unstable")
 
 (require 'ack-and-a-half)
 (defalias 'ack 'ack-and-a-half)
@@ -69,7 +69,7 @@
 (setq twittering-convert-fix-size 48)
 (setq twittering-use-icon-storage t)
 
-
+(setq sml/no-confirm-load-theme t)
 (sml/setup)
 (ido-vertical-mode)
 (diminish 'eldoc-mode)
@@ -145,14 +145,42 @@
   (spotify-linux-command "Next"))
 
 (global-set-key (kbd "<XF86AudioPlay>") 'spotify-toggle)
-(global-set-key (kbd "<XF86AudioNext>") 'spotify-next)
-(global-set-key (kbd "<XF86AudioPrev>") 'spotify-previous)
+(global-set-key (kbd "<XF86Launch9>") 'spotify-next)
+(global-set-key (kbd "<XF86Launch8>") 'spotify-previous)
+(global-set-key (kbd "<pause>") 'spotify-toggle)
 
 
 (setq js2-basic-offset 2)
 (setq js2-bounce-indent-p t)
-
-(require 'edit-server)
-(edit-server-start)
+(setq-default js2-basic-offset 2)
 
 (setq ham-mode-markdown-command '("/usr/bin/markdown" file))
+
+(add-to-list 'default-frame-alist '(font . "Monaco 10"))
+
+(setenv "GPG_AGENT_INFO" nil)
+
+(defun eldoc-documentation-function-default ())
+
+(elpy-enable)
+
+(elpy-use-ipython)
+
+(define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
+(define-key elpy-mode-map (kbd "C-c C-t") 'elpy-test-nose-runner)
+
+(defun python-add-breakpoint ()
+  "Add a break point"
+  (interactive)
+  (newline-and-indent)
+  (insert "import ipdb; ipdb.set_trace()")
+  (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
+
+(eval-after-load "eww"
+  '(progn (define-key eww-mode-map "f" 'eww-lnum-follow)
+          (define-key eww-mode-map "F" 'eww-lnum-universal)))
+
+(global-auto-complete-mode nil)
+(evil-mode)
+(set-cursor-color "yellow")
+(setq ac-modes (remove-if (lambda (x) (string= "python-mode" x)) ac-modes))

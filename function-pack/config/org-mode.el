@@ -5,6 +5,7 @@
 (require 'org-checklist)
 (require 'org-crypt)
 (require 'org-contacts)
+(require 'ox-md)
 
 (defun my-org-mode-hook ()
   (git-gutter-mode))
@@ -26,9 +27,9 @@
 ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, and org-protocol
 (setq org-capture-templates
       (quote (("t" "todo" entry (file "~/org/refile.org")
-               "* TODO %?\n%U\n  %i")
+               "* TODO %?\n%U\n%a\n  %i" :clock-in t :clock-resume t)
               ("n" "note" entry (file "~/org/refile.org")
-               "* %? :NOTE:\n%U\n  %i")
+               "* %? :NOTE:\n%U\n%a\n  %i" :clock-in t :clock-resume t)
               ("j" "Journal" entry (file+datetree "~/org/diary.org")
                "* %?\n%U\n  %i")
               ("u" "url" entry (file "~/org/refile.org")
@@ -44,8 +45,8 @@
   :END:" :clock-in t :clock-resume t))))
 
 ; Targets include this file and any file contributing to the agenda - up to 2 levels deep
-(setq org-refile-targets (quote ((nil :maxlevel . 3)
-                                 (org-agenda-files :maxlevel . 3)))
+(setq org-refile-targets (quote ((nil :maxlevel . 10)
+                                 (org-agenda-files :maxlevel . 4)))
       org-refile-use-outline-path nil ; Stop using paths for refile targets - we file directly with IDO
       org-outline-path-complete-in-steps nil ; Targets complete directly with IDO
       org-refile-allow-creating-parent-nodes (quote confirm) ; Allow refile to create parent tasks with confirmation
@@ -203,7 +204,7 @@
 (setq org-enable-priority-commands nil)
 
 (setq org-todo-keywords
-      (quote ((sequence "TODO(t)" "NEXT(n)" "STARTED(s)" "|" "DONE(d!/!)")
+      (quote ((sequence "TODO(t)" "PODIO(p)" "STARTED(s)" "|" "DONE(d!/!)")
               (sequence "WAITING(w@/!)" "SOMEDAY(S!)" "|" "CANCELLED(c@/!)" "PHONE")
               (sequence "OPEN(O!)" "|" "CLOSED(C!)"))))
 
@@ -367,27 +368,27 @@
 
 
 ;; org-publish settings
-(require 'org-publish)
-(setq org-publish-project-alist
-      '(("org-notes"
-         :base-directory "~/org/"
-         :base-extension "org"
-         :publishing-directory "~/org-www/"
-         :recursive t
-         :publishing-function org-html-publish-to-html
-         :headline-levels 10
-         :makeindex t
-         :auto-sitemap t
-         :sitemap-filename "sitemap.org"
-         :sitemap-title "Sitemap"
-         :auto-preamble t)
-        ("org-static"
-         :base-directory "~/org/"
-         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
-         :publishing-directory "~/org-www/"
-         :recursive t
-         :publishing-function org-html-publish-to-html)
-        ("org" :components ("org-notes" "org-static"))))
+;; (require 'org-publish)
+;; (setq org-publish-project-alist
+;;       '(("org-notes"
+;;          :base-directory "~/org/"
+;;          :base-extension "org"
+;;          :publishing-directory "~/org-www/"
+;;          :recursive t
+;;          :publishing-function org-html-publish-to-html
+;;          :headline-levels 10
+;;          :makeindex t
+;;          :auto-sitemap t
+;;          :sitemap-filename "sitemap.org"
+;;          :sitemap-title "Sitemap"
+;;          :auto-preamble t)
+;;         ("org-static"
+;;          :base-directory "~/org/"
+;;          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+;;          :publishing-directory "~/org-www/"
+;;          :recursive t
+;;          :publishing-function org-html-publish-to-html)
+;;         ("org" :components ("org-notes" "org-static"))))
 
  (setq org-export-html-style-include-scripts nil
        org-export-html-style-include-default nil)
@@ -425,6 +426,7 @@
          (latex . t))))
 
 (setq org-confirm-babel-evaluate nil)
+(setq org-plantuml-jar-path (expand-file-name "~/Downloads/plantuml.jar"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

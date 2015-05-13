@@ -2,6 +2,10 @@
   "phpunit"
   "points to the phpunit executable")
 
+;; (defcustom phpunit-executable
+;;   "points to the phpunit executable"
+;;   :type 'string)
+
 (defvar phpunit-regex
   '("^\\(.*\\.php\\):\\([0-9]+\\)$" 1 2 nil nil 1)
   "Regexp used to match PHPUnit output. See `compilation-error-regexp-alist'.")
@@ -25,14 +29,16 @@
   nil
   "list of commands to run before phpunit, same format as phpunit-toggle-switches")
 
-(setq compilation-finish-function
-      (lambda (buf str)
-        (next-error-follow-minor-mode)
-        (unless (string-match "exited abnormally" str)
-          (run-at-time
-           "2 sec" nil 'delete-windows-on
-           (get-buffer-create "*compilation*"))
-          (and (next-error-follow-minor-mode) (message "No Compilation Errors!")))))
+;; (setq compilation-finish-function
+;;       (lambda (buf str)
+;;         (next-error-follow-minor-mode)
+;;         (unless (string-match "exited abnormally" str)
+;;           (run-at-time
+;;            "2 sec" nil 'delete-windows-on
+;;            (get-buffer-create "*phpunit-run*"))
+;;           (and (next-error-follow-minor-mode) (message "No Compilation Errors!")))))
+
+(setq compilation-finish-function (lambda (buf str) nil))
 
 (define-compilation-mode phpunit-run-mode "PHPUnit"
   (add-to-list (make-local-variable 'compilation-error-regexp-alist)
